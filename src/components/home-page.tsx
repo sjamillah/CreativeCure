@@ -1,8 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 
-
-export default function Home() {
+export function HomePage() {
   return (
     <div className="flex flex-col min-h-screen bg-green-50">
       <header className="px-4 lg:px-6 h-16 flex items-center bg-white shadow-md">
@@ -40,7 +38,7 @@ export default function Home() {
               width="550"
               height="550"
               alt="Hero"
-              className="mx-auto rounded-2xl rounded-lg object-cover shadow-lg"
+              className="mx-auto rounded-2xl object-cover shadow-lg"
             />
           </div>
         </section>
@@ -172,4 +170,3 @@ function XIcon(props) {
     </svg>
   );
 }
-
