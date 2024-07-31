@@ -12,7 +12,6 @@ export default function SignUp() {
 
   const handleSubmit = (e: { preventDefault: () => void; }) => {
     e.preventDefault();
-    // Handle signup logic here (e.g., API call)
     console.log("Form Data:", formData);
     router.push("/dashboard"); // Redirect after successful signup
   };
