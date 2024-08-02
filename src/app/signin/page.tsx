@@ -1,21 +1,31 @@
-"use client"
+"use client";
 import { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase";
 
 export default function SignIn() {
   const [formData, setFormData] = useState({ email: "", password: "" });
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  const handleChange = (e: { target: { name: any; value: any; }; }) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: { preventDefault: () => void; }) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Handle login logic here (e.g., API call)
-    console.log("Form Data:", formData);
-    router.push("/dashboard"); // Redirect after successful login
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password);
+      const user = userCredential.user;
+
+      console.log("User signed in:", user);
+      // Redirect to profile after successful login
+      router.push("/profile");
+    } catch (error: any) {
+      setError(error.message);
+      console.error("Error signing in:", error);
+    }
   };
 
   return (
@@ -47,15 +57,16 @@ export default function SignIn() {
               className="w-full px-4 py-2 border border-green-300 rounded-lg focus:outline-none focus:ring focus:border-green-500"
             />
           </div>
+          {error && <p className="text-red-500 text-sm">{error}</p>}
           <button type="submit" className="w-full py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
             Log In
           </button>
         </form>
         <p className="text-center text-green-700 mt-4">
           Don&apos;t have an account?{" "}
-          <Link href="/signup" className="text-green-800 font-semibold hover:underline" prefetch={false}>
+          <a href="/signup" className="text-green-800 font-semibold hover:underline">
             Sign Up
-          </Link>
+          </a>
         </p>
       </div>
     </div>

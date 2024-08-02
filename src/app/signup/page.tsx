@@ -1,19 +1,46 @@
+"use client";
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
+import { auth } from "../firebase"; // Adjust the import path as needed
+import { createUserWithEmailAndPassword, updateProfile, User } from "firebase/auth";
+
+// Define the type for form data
+interface FormData {
+  name: string;
+  email: string;
+  password: string;
+}
 
 export default function SignUp() {
-  const [formData, setFormData] = useState({ name: "", email: "", password: "" });
+  const [formData, setFormData] = useState<FormData>({ name: "", email: "", password: "" });
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  const handleChange = (e) => {
+  // Handle input changes and update form data
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: { preventDefault: () => void; }) => {
+  // Handle form submission
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Form Data:", formData);
-    router.push("/dashboard"); // Redirect after successful signup
+    try {
+      // Create a new user with email and password
+      const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+      const user: User = userCredential.user;
+
+      console.log("User registered:", user);
+
+      // Update user profile with display name
+      await updateProfile(user, { displayName: formData.name });
+
+      // Redirect to the dashboard after successful signup
+      router.push("/dashboard");
+    } catch (error: any) {
+      setError(error.message);
+      console.error("Error signing up:", error);
+    }
   };
 
   return (
@@ -57,13 +84,14 @@ export default function SignUp() {
               className="w-full px-4 py-2 border border-green-300 rounded-lg focus:outline-none focus:ring focus:border-green-500"
             />
           </div>
+          {error && <p className="text-red-500 text-sm">{error}</p>}
           <button type="submit" className="w-full py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
             Sign Up
           </button>
         </form>
         <p className="text-center text-green-700 mt-4">
           Already have an account?{" "}
-          <Link href="/login" className="text-green-800 font-semibold hover:underline" prefetch={false}>
+          <Link href="/signin" className="text-green-800 font-semibold hover:underline" prefetch={false}>
             Log In
           </Link>
         </p>
