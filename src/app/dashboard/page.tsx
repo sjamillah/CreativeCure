@@ -46,9 +46,9 @@ const Home = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-green-50">
+    <div className="flex flex-col min-h-screen bg-background relative">
       {/* Header */}
-      <header className="px-4 lg:px-6 h-16 flex items-center bg-white shadow-md fixed top-0 left-0 w-full z-10">
+      <header className="px-4 lg:px-6 h-16 flex items-center bg-white shadow-md relative top-0 left-0 w-full z-50">
         <Link href="/" className="flex items-center space-x-2" prefetch={false}>
           <img
             src="/creativelogo.png" 
@@ -81,34 +81,51 @@ const Home = () => {
         </nav>
       </header>
 
-      <main className="flex-1">
-        <section className="relative h-screen">
-          <img
-            src="/mentalhealth.avif"
-            layout="fill"
-            objectFit="cover"
-            alt="Hero"
-            className="opacity-1"
-          />
-          <div className="absolute inset-0 bg-white opacity-30 mix-blend-overlay"></div>
-          <div className="container mx-auto px-4 md:px-6 flex flex-row items-center justify-center h-full text-center z-10">
-            <div className="space-y-4 text-center">
-              <h1 className="text-4xl font-bold text-white sm:text-5xl md:text-6xl">
-                Creative Cure
-              </h1>
-              <p className="text-lg text-white/80 max-w-xl">
-                Experience personalized therapy sessions tailored to your unique needs. Our team of licensed therapists offers a variety of therapeutic approaches, including cognitive-behavioral therapy, psychodynamic therapy, and holistic methods. We prioritize creating a safe, confidential, and supportive environment where you can explore your thoughts and feelings. Whether you are dealing with anxiety, depression, relationship issues, or personal growth, our therapists are committed to guiding you towards healing and self-discovery.
+{/* Main Content Section (Parallax) */}
+<main className="flex-1 relative z-20"> 
+<section className="relative h-screen w-full fixed top-0 left-0 z-10">
+          {/* Background Image */}
+          <div className="absolute inset-0 z-0">
+            <Image
+              src="/mentalhealth.avif"
+              layout="fill"
+              objectFit="cover"
+              alt="Hero"
+            />
+          </div>
+
+          {/* Quote Section */}
+          <section className="absolute top-0 w-full h-full z-20"> 
+            <div className="container mx-auto px-4 md:px-6 flex flex-col items-center justify-center h-full text-center">
+              <p className="text-2xl text-white/80 max-w-xl">
+                <span className="italic font-dark text-green-600">"You are not alone in your journey. We believe in creating a space where you feel safe to explore, grow, and heal."</span> <br />
               </p>
             </div>
-          </div>
-        </section>
+          </section>
+        </section> 
 
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-green-50">
+        <section className="w-full py-12 md:py-24 lg:py-32">
           <div className="container mx-auto px-4 md:px-6 space-y-6">
+            {/* Personalized Therapy Section */}
             <div className="space-y-2 text-center">
-              <h2 className="text-3xl font-bold text-green-800 sm:text-4xl md:text-5xl">Meet Our Therapists</h2>
+              <h2 className="text-3xl font-bold text-green-800 sm:text-4xl md:text-5xl">
+                Experience Personalized Therapy
+              </h2>
               <p className="max-w-2xl mx-auto text-green-700 md:text-xl">
-                Our team of experienced therapists is dedicated to giving therapy to people with autism and psychological disorders.
+                At Creative Cure, we understand that everyone's journey is unique.
+                We offer personalized therapy sessions tailored to your specific
+                needs, empowering you to heal, grow, and thrive.
+              </p>
+            </div>
+
+            {/* Therapists Section */}
+            <div className="space-y-2 text-center">
+              <h2 className="text-3xl font-bold text-green-800 sm:text-4xl md:text-5xl">
+                Meet Our Therapists
+              </h2>
+              <p className="max-w-2xl mx-auto text-green-700 md:text-xl">
+                Our team of experienced therapists is dedicated to giving
+                therapy to people with autism and psychological disorders.
               </p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
@@ -138,25 +155,36 @@ const Home = () => {
             </div>
           </div>
         </section>
+
+      <section id="companySec" className="grid grid-cols-1 lg:grid-cols-2 md:grid-cols-4"> {/* Use grid for layout */}
+      <div className="relative w-full">
+        <img 
+          src="/supportsec.jpg"
+          alt="Company Info"
+          layout="relative"
+          width={800}
+          height={800}
+          className="rounded-full"
+        />
+      </div>
+      <div className="xl:md-0 xl:w-100/50 p-6 bg-primary-foreground"> {/* Text Container */}
+        <h2 className="text-2xl font-bold text-green-800 mb-4">Support Your Loved Ones</h2>
+        <p className="text-green-700">
+          Navigating the challenges of psychological and autistic disorders can be overwhelming, but you don't have to do it alone. Our platform offers comprehensive resources and expert guidance to support you and your family every step of the way.
+        </p>
+        <p className="text-green-700">
+          Join our community and connect with other parents and caregivers who understand your journey. Together, we can create a nurturing environment that fosters growth, resilience, and well-being for your loved ones.
+        </p>
+      </div>
+    </section>
       </main>
 
       <footer className="bg-green-100 p-6 md:py-12 w-full">
-        <div className="container max-w-7xl mx-auto flex justify-between items-center">
+        <div className="container max-w-7xl mx-auto flex justify-center items-center">
           <div>
             <p className="text-sm text-gray-600">
               Creative Cure 2024 © COMP 2800
             </p>
-          </div>
-          <div className="flex space-x-4">
-            <a href="#" target="_blank" rel="noopener noreferrer">
-              <i className="bi bi-twitter text-gray-600 hover:text-green-600"></i>
-            </a>
-            <a href="#" target="_blank" rel="noopener noreferrer">
-              <i className="bi bi-instagram text-gray-600 hover:text-green-600"></i>
-            </a>
-            <a href="#" target="_blank" rel="noopener noreferrer">
-              <i className="bi bi-facebook text-gray-600 hover:text-green-600"></i>
-            </a>
           </div>
         </div>
       </footer>

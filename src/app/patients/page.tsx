@@ -4,9 +4,8 @@ import Link from 'next/link';
 import Modal from 'react-modal';
 import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { collection, getDocs, addDoc, query, where } from 'firebase/firestore';
-import { db } from '../firebase'; 
-import { useAuthState } from 'react-firebase-hooks/auth'; 
-import { auth } from '../firebase'; 
+import { db, auth } from '../firebase'; 
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 interface Therapist {
   name: string;
@@ -80,6 +79,16 @@ const PatientsPage = () => {
     fetchAppointments();
   }, [user]); 
 
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      router.push('/signin');
+      console.log("User signed out successfully.");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
+
   const openModal = (therapist: Therapist) => {
     if (!isLoading) { 
       setSelectedTherapist(therapist);
@@ -128,10 +137,10 @@ const PatientsPage = () => {
   return (
     <div className="flex flex-col min-h-screen bg-green-50">
       {/* Header */}
-      <header className="px-4 lg:px-6 h-16 flex items-center bg-white shadow-md fixed top-0 left-0 w-full z-10">
+      <header className="px-4 lg:px-6 h-16 flex items-center bg-white shadow-md relative top-0 left-0 w-full z-50">
         <Link href="/" className="flex items-center space-x-2" prefetch={false}>
-          <Image
-            src="/images/creativefavicon.png" 
+          <img
+            src="/creativelogo.png" 
             width={24}
             height={24}
             alt="Creative Cure Logo"
@@ -332,7 +341,13 @@ const PatientsPage = () => {
       </section>
 
       <footer className="bg-green-100 p-6 md:py-12 w-full">
-        Creative Cure 2024 © COMP 2800
+        <div className="container max-w-7xl mx-auto flex justify-center items-center">
+          <div>
+            <p className="text-sm text-gray-600">
+              Creative Cure 2024 © COMP 2800
+            </p>
+          </div>
+        </div>
       </footer>
       {/* Appointment Booking Modal */}
       <Modal

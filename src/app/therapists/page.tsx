@@ -1,11 +1,12 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState, useEffect } from 'react';
-import { collection, getDocs } from "firebase/firestore";
-import { db, auth } from '../firebase';
+import Modal from 'react-modal';
+import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
+import { collection, getDocs, addDoc, query, where } from 'firebase/firestore';
+import { db } from '../firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { signOut } from 'firebase/auth';
+import { auth } from '../firebase';
 import { useRouter } from 'next/navigation';
 
 interface Therapist {
@@ -14,26 +15,118 @@ interface Therapist {
   image: string;
   description: string;
   uid: string;
+  availability: {
+    [day: string]: string[]; // Example: { "Monday": ["10:00 AM", "11:00 AM", "2:00 PM"] }
+  };
 }
 
-const Dashboard = () => {
+interface Appointment {
+  id?: string;
+  date: string;
+  time: string;
+  therapist: string;
+  status: 'pending' | 'confirmed' | 'completed';
+  patientId: string;
+}
+
+const TherapistsPage = () => {
   const [therapists, setTherapists] = useState<Therapist[]>([]);
   const [user, loading, error] = useAuthState(auth);
   const router = useRouter();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedTherapist, setSelectedTherapist] = useState<Therapist | null>(null);
+  const [newAppointment, setNewAppointment] = useState<Appointment>({
+    date: "",
+    time: "",
+    therapist: "",
+    status: 'pending',
+    patientId: user?.uid || '',
+  });
+
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchTherapists = async () => {
-      const therapistsCollection = collection(db, 'therapists');
-      const querySnapshot = await getDocs(therapistsCollection);
-      const therapistData = querySnapshot.docs.map((doc) => ({
-        ...doc.data(),
-        uid: doc.id 
-      })) as Therapist[];
-      setTherapists(therapistData);
+      try {
+        const therapistsCollection = collection(db, 'therapists');
+        const querySnapshot = await getDocs(therapistsCollection);
+        const therapistData = querySnapshot.docs.map((doc) => ({
+          ...doc.data(),
+          uid: doc.id,
+        })) as Therapist[];
+        setTherapists(therapistData);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching therapists:", error);
+      }
     };
 
     fetchTherapists();
   }, []);
+
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        // Fetch appointments for the current user only
+        const appointmentCollection = collection(db, 'appointments');
+        const q = query(appointmentCollection, where('patientId', '==', user?.uid));
+        const appointmentSnapshot = await getDocs(q);
+        const appointmentList = appointmentSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as Appointment[];
+        setAppointments(appointmentList);
+      } catch (error) {
+        console.error("Error fetching appointments:", error);
+      }
+    };
+
+    fetchAppointments();
+  }, [user]); 
+
+
+  const openModal = (therapist: Therapist) => {
+    setSelectedTherapist(therapist);
+    setNewAppointment({
+      ...newAppointment,
+      therapist: therapist.name,
+    });
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setSelectedTherapist(null);
+    setNewAppointment({
+      date: "",
+      time: "",
+      therapist: "",
+      status: 'pending',
+      patientId: user?.uid || '',
+    });
+    setIsModalOpen(false);
+  };
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { id, value } = e.target;
+    setNewAppointment({ ...newAppointment, [id]: value });
+  };
+
+  const handleBooking = async (e: FormEvent) => {
+    e.preventDefault();
+    try {
+      // Instead of adding the appointment directly, you'll likely want to:
+      // 1.  Trigger a payment process (e.g., using Stripe)
+      // 2.  After successful payment, create the appointment in Firestore
+      // 3.  Update the appointment status to 'confirmed' 
+
+      // For now, we'll just create the appointment with pending status
+      await addDoc(collection(db, "appointments"), newAppointment);
+      setAppointments([...appointments, { ...newAppointment }]);
+      closeModal();
+    } catch (error) {
+      console.error("Error booking appointment:", error);
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -46,9 +139,9 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-green-50">
+    <div className="flex flex-col min-h-screen bg-green-50 relative"> 
       {/* Header */}
-      <header className="px-4 lg:px-6 h-16 flex items-center bg-white shadow-md fixed top-0 left-0 w-full z-10">
+      <header className="px-4 lg:px-6 h-16 flex items-center bg-white shadow-md fixed top-0 left-0 w-full z-50"> 
         <Link href="/" className="flex items-center space-x-2" prefetch={false}>
           <img
             src="/creativelogo.png" 
@@ -60,8 +153,8 @@ const Dashboard = () => {
           <span className="sr-only">Creative Cure - Therapists</span>
         </Link>
         <nav className="ml-auto flex space-x-4 sm:space-x-6">
-          <Link href="/therapists" className="text-sm font-medium text-green-600 hover:underline" prefetch={false}>
-            Therapists
+          <Link href="/dashboard" className="text-sm font-medium text-green-600 hover:underline" prefetch={false}>
+            Home
           </Link>
           <Link href="/patients" className="text-sm font-medium text-green-600 hover:underline" prefetch={false}>
             Patients
@@ -81,91 +174,185 @@ const Dashboard = () => {
         </nav>
       </header>
 
-      <main className="flex-1">
-        <section className="relative h-screen">
+      {/* Hero Section (Fixed) */}
+      <section className="relative h-screen w-full fixed top-0 left-0 z-10"> {/* Add fixed to make it stay on top */}
+        {/* Background Image */}
+        <div className="absolute inset-0 z-0">
           <img
-            src="/mentalhealth.avif"
+            src="/therapistbackground.jpg"
             layout="fill"
             objectFit="cover"
-            alt="Hero"
-            className="opacity-1"
+            alt="Therapist Image"
           />
-          <div className="absolute inset-0 bg-white opacity-30 mix-blend-overlay"></div>
-          <div className="container mx-auto px-4 md:px-6 flex flex-row items-center justify-center h-full text-center z-10">
-            <div className="space-y-4 text-center">
-              <h1 className="text-4xl font-bold text-white sm:text-5xl md:text-6xl">
-                Creative Cure
-              </h1>
-              <p className="text-lg text-white/80 max-w-xl">
-                Experience personalized therapy sessions tailored to your unique needs. Our team of licensed therapists offers a variety of therapeutic approaches, including cognitive-behavioral therapy, psychodynamic therapy, and holistic methods. We prioritize creating a safe, confidential, and supportive environment where you can explore your thoughts and feelings. Whether you are dealing with anxiety, depression, relationship issues, or personal growth, our therapists are committed to guiding you towards healing and self-discovery.
-              </p>
-            </div>
+        </div>
+
+        {/* Quote Section */}
+        <section className="absolute top-0 w-full h-full z-20"> 
+          <div className="container mx-auto px-4 md:px-6 flex flex-col items-center justify-center h-full text-center">
+            <h1 className="text-4xl font-bold text-white sm:text-5xl md:text-6xl">
+              Creative Cure
+            </h1>
+            <p className="text-lg text-white/80 max-w-xl">
+              <span className="italic font-dark">"You are not alone in your journey. We believe in creating a space where you feel safe to explore, grow, and heal."</span> <br />
+            </p>
           </div>
         </section>
+      </section> 
 
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-green-50">
+      {/* Main Content Section (Parallax) */}
+      <main className="flex-1 relative z-20 mt-screen"> 
+        {/* Therapists Section */}
+        <section className="w-full py-12 md:py-24 lg:py-32">
           <div className="container mx-auto px-4 md:px-6 space-y-6">
             <div className="space-y-2 text-center">
-              <h2 className="text-3xl font-bold text-green-800 sm:text-4xl md:text-5xl">Meet Our Therapists</h2>
+              <h2 className="text-3xl font-bold text-green-800 sm:text-4xl md:text-5xl">
+                Meet Our Therapists
+              </h2>
               <p className="max-w-2xl mx-auto text-green-700 md:text-xl">
-                Our team of experienced therapists is dedicated to giving therapy to people with autism and psychological disorders.
+                Our team of experienced therapists is dedicated to giving therapy
+                to people with autism and psychological disorders.
               </p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-              {therapists.length > 0 ? (
-                therapists.map((therapist) => (
-                  <div
-                    key={therapist.uid}
-                    className="bg-white/70 backdrop-blur-lg border border-green-200 rounded-lg shadow-lg hover:shadow-xl transition-shadow p-6 flex flex-col items-center space-y-4"
-                  >
-                    <div className="w-16 h-16 bg-green-200 rounded-full flex items-center justify-center">
-                      <Image
-                        src={therapist.image}
-                        width={64}
-                        height={64}
-                        alt={`${therapist.name} icon`}
-                        className="rounded-full object-cover"
-                      />
-                    </div>
-                    <h3 className="text-xl font-semibold text-green-800">
-                      {therapist.name}
-                    </h3>
-                    <p className="text-green-600">{therapist.specialization}</p>
-                    <p className="text-center text-green-700">
-                      {therapist.description}
-                    </p>
+              {therapists.map((therapist) => (
+                <div
+                  key={therapist.uid}
+                  className="bg-white/70 backdrop-blur-lg border border-green-200 rounded-lg shadow-lg hover:shadow-xl transition-shadow p-6 flex flex-col items-center space-y-4"
+                >
+                  <div className="w-16 h-16 bg-green-200 rounded-full flex items-center justify-center">
+                    <img
+                      src={therapist.image}
+                      width={64}
+                      height={64}
+                      alt={`${therapist.name} icon`}
+                      className="rounded-full object-cover"
+                    />
                   </div>
-                ))
-              ) : (
-                <p className="text-center text-gray-500">No therapists available at the moment.</p>
-              )}
+                  <h3 className="text-xl font-semibold text-green-800">
+                    {therapist.name}
+                  </h3>
+                  <p className="text-green-600">{therapist.specialization}</p>
+                  <p className="text-center text-green-700">
+                    {therapist.description}
+                  </p>
+                  <button
+                    onClick={() => openModal(therapist)}
+                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 mt-4"
+                  >
+                    Book Session
+                  </button>
+                </div>
+              ))}
             </div>
           </div>
         </section>
+
+        {/* Other Sections (With Parallax Effect) */}
+        {/* ... (Add your other sections here) */}
       </main>
 
       <footer className="bg-green-100 p-6 md:py-12 w-full">
-        <div className="container max-w-7xl mx-auto flex justify-between items-center">
+        <div className="container max-w-7xl mx-auto flex justify-center items-center">
           <div>
             <p className="text-sm text-gray-600">
               Creative Cure 2024 © COMP 2800
             </p>
           </div>
-          <div className="flex space-x-4">
-            <a href="#" target="_blank" rel="noopener noreferrer">
-              <i className="bi bi-twitter text-gray-600 hover:text-green-600"></i>
-            </a>
-            <a href="#" target="_blank" rel="noopener noreferrer">
-              <i className="bi bi-instagram text-gray-600 hover:text-green-600"></i>
-            </a>
-            <a href="#" target="_blank" rel="noopener noreferrer">
-              <i className="bi bi-facebook text-gray-600 hover:text-green-600"></i>
-            </a>
-          </div>
         </div>
       </footer>
+      {/* Appointment Booking Modal */}
+      <Modal
+        isOpen={isModalOpen}
+        onRequestClose={closeModal}
+        contentLabel="Book Appointment Modal"
+        className="bg-white p-6 rounded-lg shadow-lg max-w-md mx-auto mt-20"
+        overlayClassName="fixed inset-0 bg-black bg-opacity-50"
+      >
+        <h2 className="text-xl font-bold mb-4">Book Appointment</h2>
+        <form onSubmit={handleBooking}>
+          <div className="mb-4">
+            <label htmlFor="date" className="block text-gray-700">Date</label>
+            <input
+              id="date"
+              type="date"
+              value={newAppointment.date}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded"
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label htmlFor="time" className="block text-gray-700">Time</label>
+            <input
+              id="time"
+              type="time"
+              value={newAppointment.time}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded"
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label htmlFor="therapist" className="block text-gray-700">Therapist</label>
+            <select
+              id="therapist"
+              value={newAppointment.therapist}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded"
+            >
+              {!isLoading && therapists.map((therapist) => (
+                <option key={therapist.uid} value={therapist.name}>
+                  {therapist.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="flex justify-end space-x-4">
+            <button
+              type="button"
+              onClick={closeModal}
+              className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+            >
+              Book Appointment
+            </button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 };
 
-export default Dashboard;
+export default TherapistsPage;
+
+const therapists = [
+  {
+    name: "Katty Houston",
+    specialization: "Child Therapist",
+    image: "/therapist2.jpg",
+    description: "Katty is a licensed child therapist with over 5 years of experience helping youth overcome emotional and behavioral challenges."
+  },
+  {
+    name: "Michael Johnson",
+    specialization: "Art and Autism Therapist",
+    image: "/therapist3.jpg",
+    description: "Michael is a skilled therapist with 15 years of experience who helps young kids with autism express their emotions and work through creative expression."
+  },
+  {
+    name: "Sarah Anderson",
+    specialization: "Autism Therapist",
+    image: "/therapist2.jpg",
+    description: "Sarah is a therapist with 5 years of experience who specializes in helping people with autism disorders and analyzes the behavior of these people to help them through therapy."
+  },
+  {
+    name: "Audrey Hauston",
+    specialization: "Art and Psychological Therapist",
+    image: "/therapist5.jpg",
+    description: "Audrey is a skilled art therapist who helps youth express their emotions and work through trauma through creative expression."
+  }
+];

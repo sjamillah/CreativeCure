@@ -45,7 +45,15 @@ export default function SignUp() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-green-100">
-      <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
+      <div className="absolute inset-0 z-0"> {/* Add a div for the background image */}
+<img
+  src="/loginbackground.jpg"
+  layout="responsive"
+  className="object-cover h-screen w-screen"
+  alt="Background Image"
+/>
+</div>
+      <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full z-10">
         <h1 className="text-2xl font-bold mb-6 text-green-800">Sign Up</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
