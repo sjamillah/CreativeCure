@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '../firebase'; 
+import { auth, signOut } from '../firebase';
 import { useRouter } from 'next/navigation';
 
 const Home = () => {
@@ -12,7 +12,7 @@ const Home = () => {
 
   const handleLogout = async () => {
     try {
-      await signOut(auth);
+      await signOut(auth); // Use Firebase signOut method
       router.push('/signin');
       console.log("User signed out successfully.");
     } catch (error) {
@@ -21,12 +21,12 @@ const Home = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-green-50 relative"> 
+    <div className="flex flex-col min-h-screen bg-green-50 relative">
       {/* Header */}
-      <header className="px-4 lg:px-6 h-16 flex items-center bg-white shadow-md fixed top-0 left-0 w-full z-50"> 
+      <header className="px-4 lg:px-6 h-16 flex items-center bg-white shadow-md fixed top-0 left-0 w-full z-50">
         <Link href="/" className="flex items-center space-x-2" prefetch={false}>
           <Image
-            src="/creativelogo.png" 
+            src="/creativelogo.png"
             width={24}
             height={24}
             alt="Creative Cure Logo"
@@ -57,7 +57,7 @@ const Home = () => {
       </header>
 
       {/* Hero Section (Fixed) */}
-      <section className="relative h-screen w-full fixed top-0 left-0 z-10"> {/* Add fixed to make it stay on top */}
+      <section className="relative h-screen w-full fixed top-0 left-0 z-10">
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <Image
@@ -69,7 +69,7 @@ const Home = () => {
         </div>
 
         {/* Quote Section */}
-        <section className="absolute top-0 w-full h-full z-20"> 
+        <section className="absolute top-0 w-full h-full z-20">
           <div className="container mx-auto px-4 md:px-6 flex flex-col items-center justify-center h-full text-center">
             <h1 className="text-4xl font-bold text-white sm:text-5xl md:text-6xl">
               Creative Cure
@@ -79,11 +79,10 @@ const Home = () => {
             </p>
           </div>
         </section>
-      </section> 
+      </section>
 
       {/* Main Content Section (Parallax) */}
-      <main className="flex-1 relative z-20 mt-screen"> 
-
+      <main className="flex-1 relative z-20 mt-screen">
         {/* Welcome Message (Conditional) */}
         <section className="w-full py-12 md:py-24 lg:py-32 bg-green-50">
           <div className="container mx-auto px-4 md:px-6 space-y-6">

@@ -1,11 +1,10 @@
 "use client";
 import { useState, useEffect, useRef, FormEvent } from 'react';
-import { db } from '../firebase';
+import { db, auth } from '../firebase';
 import { collection, onSnapshot, addDoc, DocumentData, Timestamp } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '../firebase';
 import Link from 'next/link'; 
-import { signOut } from 'next-auth/react';
+import { signOut } from 'firebase/auth'; // Import signOut from Firebase Authentication
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
@@ -66,7 +65,7 @@ const CommunityChatsPage = () => {
 
   const handleLogout = async () => {
     try {
-      await signOut(auth);
+      await signOut(auth); // Use Firebase signOut function
       router.push('/signin');
       console.log("User signed out successfully.");
     } catch (error) {
@@ -79,7 +78,7 @@ const CommunityChatsPage = () => {
       {/* Header */}
       <header className="px-4 lg:px-6 h-16 flex items-center bg-white shadow-md fixed top-0 left-0 w-full z-10">
         <Link href="/" className="flex items-center space-x-2" prefetch={false}>
-        <Image
+          <Image
             src="/creativelogo.png" 
             width={24}
             height={24}
@@ -89,7 +88,7 @@ const CommunityChatsPage = () => {
           <span className="sr-only">Creative Cure - Therapists</span>
         </Link>
         <nav className="ml-auto flex space-x-4 sm:space-x-6">
-        <Link href="/dashboard" className="text-sm font-medium text-green-600 hover:underline" prefetch={false}>
+          <Link href="/dashboard" className="text-sm font-medium text-green-600 hover:underline" prefetch={false}>
             Home
           </Link>
           <Link href="/therapists" className="text-sm font-medium text-green-600 hover:underline" prefetch={false}>
