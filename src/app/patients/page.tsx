@@ -197,19 +197,18 @@ const PatientsPage = () => {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             <div className="bg-white/70 backdrop-blur-lg border border-green-200 rounded-lg shadow-lg hover:shadow-xl transition-shadow p-6 flex flex-col items-center space-y-4">
-              <a href="https://quickdraw.withgoogle.com/#" target="_blank" rel="noopener noreferrer">
                 <Image
-                  src="/images/quickdraw.png" 
+                  src="/quickdraw.png" 
                   width={64}
                   height={64}
                   alt="Quickdraw"
                   className="rounded-full object-cover"
                 />
-              </a>
               <h3 className="text-xl font-semibold text-green-800">
                 Quickdraw
               </h3>
-              <p className="text-green-600">Creative Expression Tool</p>
+              <p className="text-green-600"><a href="https://quickdraw.withgoogle.com/" target="_blank" rel="noopener noreferrer">
+              Creative Expression Tool</a></p>
               <p className="text-center text-green-700">
                 Express yourself visually with Quickdraw, a fun and interactive
                 drawing tool. 
@@ -217,19 +216,17 @@ const PatientsPage = () => {
             </div>
 
             <div className="bg-white/70 backdrop-blur-lg border border-green-200 rounded-lg shadow-lg hover:shadow-xl transition-shadow p-6 flex flex-col items-center space-y-4">
-              <a href="#" target="_blank" rel="noopener noreferrer">
                 <Image
-                  src="/images/music-icon.png" 
+                  src="/music.png" 
                   width={64}
                   height={64}
                   alt="Music Therapy API"
                   className="rounded-full object-cover"
                 />
-              </a>
               <h3 className="text-xl font-semibold text-green-800">
                 Music Therapy API
               </h3>
-              <p className="text-green-600">Soothing Music Playlist</p>
+              <p className="text-green-600"> <a href="https://www.youtube.com/channel/UCLhu3qnGqYRSXgfi8rmI3gg/" target="_blank" rel="noopener noreferrer">Soothing Music Playlist</a></p>
               <p className="text-center text-green-700">
                 Listen to calming music specifically curated to help reduce
                 stress and anxiety.
@@ -239,7 +236,7 @@ const PatientsPage = () => {
             <div className="bg-white/70 backdrop-blur-lg border border-green-200 rounded-lg shadow-lg hover:shadow-xl transition-shadow p-6 flex flex-col items-center space-y-4">
               <a href="#" target="_blank" rel="noopener noreferrer">
                 <Image
-                  src="/images/blog-icon.png" 
+                  src="/blog.png" 
                   width={64}
                   height={64}
                   alt="Blog"
@@ -249,58 +246,12 @@ const PatientsPage = () => {
               <h3 className="text-xl font-semibold text-green-800">
                 Blog
               </h3>
-              <p className="text-green-600">Inspiration and Tips</p>
+              <p className="text-green-600"><a href="https://psychcentral.com/blog" target="_blank" rel="noopener noreferrer">Inspiration and Tips</a></p>
               <p className="text-center text-green-700">
                 Discover articles and insights to help you on your mental health
                 journey.
               </p>
             </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="w-full py-12 md:py-24 lg:py-32 bg-green-50">
-        <div className="container mx-auto px-4 md:px-6 space-y-6">
-          <div className="space-y-2 text-center">
-            <h2 className="text-3xl font-bold text-green-800 sm:text-4xl md:text-5xl">
-              Meet Our Therapists
-            </h2>
-            <p className="max-w-2xl mx-auto text-green-700 md:text-xl">
-              Our dedicated therapists are here to support you on your journey.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {isLoading ? (
-              <p>Loading therapists...</p>
-            ) : (
-              therapists.map((therapist) => (
-                <div
-                  key={therapist.name}
-                  className="bg-white/70 backdrop-blur-lg border border-green-200 rounded-lg shadow-lg hover:shadow-xl transition-shadow p-6 flex flex-col items-center space-y-4"
-                >
-                  <Image
-                    src={therapist.image}
-                    width={128}
-                    height={128}
-                    alt={therapist.name}
-                    className="rounded-full object-cover"
-                  />
-                  <h3 className="text-xl font-semibold text-green-800">
-                    {therapist.name}
-                  </h3>
-                  <p className="text-green-600">{therapist.specialization}</p>
-                  <p className="text-center text-green-700">
-                    {therapist.description}
-                  </p>
-                  <button
-                    onClick={() => openModal(therapist)}
-                    className="text-sm font-medium text-green-600 hover:underline"
-                  >
-                    Book Appointment
-                  </button>
-                </div>
-              ))
-            )}
           </div>
         </div>
       </section>
