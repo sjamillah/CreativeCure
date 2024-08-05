@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
+import Image from "next/image";
 
 export default function SignIn() {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -31,7 +32,7 @@ export default function SignIn() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-green-100">
       <div className="absolute inset-0 z-0"> {/* Add a div for the background image */}
-<img
+<Image
   src="/loginbackground.jpg"
   layout="responsive"
   className="object-cover h-screen w-screen"

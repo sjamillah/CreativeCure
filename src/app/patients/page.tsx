@@ -133,7 +133,7 @@ const PatientsPage = () => {
     <div className="flex flex-col min-h-screen bg-green-50">
       <header className="px-4 lg:px-6 h-16 flex items-center bg-white shadow-md relative top-0 left-0 w-full z-50">
         <Link href="/" className="flex items-center space-x-2" prefetch={false}>
-          <img
+          <Image
             src="/creativelogo.png" 
             width={24}
             height={24}
@@ -178,8 +178,8 @@ const PatientsPage = () => {
             Creative Cure - Patients
           </h1>
           <p className="text-lg text-white/80 max-w-xl">
-            <span className="italic font-light">"You are not alone in your journey. We believe in creating a space where you feel safe to explore, grow, and heal."</span> <br />
-            <span className="italic font-light">"Our therapists are dedicated to helping you find your strength and resilience. We're here to support you every step of the way."</span>
+            <span className="italic font-light">You are not alone in your journey. We believe in creating a space where you feel safe to explore, grow, and heal.</span> <br />
+            <span className="italic font-light">Our therapists are dedicated to helping you find your strength and resilience. We're here to support you every step of the way.</span>
           </p>
         </div>
       </section>

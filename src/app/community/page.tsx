@@ -7,6 +7,7 @@ import { auth } from '../firebase';
 import Link from 'next/link'; 
 import { signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 interface ChatMessage {
   id?: string;
@@ -78,7 +79,7 @@ const CommunityChatsPage = () => {
       {/* Header */}
       <header className="px-4 lg:px-6 h-16 flex items-center bg-white shadow-md fixed top-0 left-0 w-full z-10">
         <Link href="/" className="flex items-center space-x-2" prefetch={false}>
-          <img
+        <Image
             src="/creativelogo.png" 
             width={24}
             height={24}

@@ -24,7 +24,7 @@ const About = () => {
     <div className="flex flex-col min-h-screen bg-green-50 relative"> 
       <header className="px-4 lg:px-6 h-16 flex items-center bg-white shadow-md relative top-0 left-0 w-full z-50">
         <Link href="/" className="flex items-center space-x-2" prefetch={false}>
-          <img
+          <Image
             src="/creativelogo.png" 
             width={24}
             height={24}
@@ -78,7 +78,7 @@ const About = () => {
                   Creative Cure
                 </h1>
                 <p className="text-lg text-white/80 max-w-xl">
-                  <span className="italic font-light">"You are not alone in your journey. We believe in creating a space where you feel safe to explore, grow, and heal."</span> <br />
+                  <span className="italic font-light">You are not alone in your journey. We believe in creating a space where you feel safe to explore, grow, and heal.</span> <br />
                 </p>
               </div>
             </section>
@@ -161,9 +161,6 @@ const About = () => {
               </section>
             </div>
           </section>
-
-          {/* Other Sections (With Parallax Effect) */}
-          {/* ... (Add your other sections here) */}
       </main>
 
       <footer className="bg-green-100 p-6 md:py-12 w-full">

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { auth } from "../firebase"; // 
 import { createUserWithEmailAndPassword, updateProfile, User } from "firebase/auth";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
+import Image from "next/image";
 
 // Define the type for form data
 interface FormData {
@@ -64,7 +65,7 @@ export default function SignUp() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-green-100">
       <div className="absolute inset-0 z-0"> {/* Add a div for the background image */}
-        <img
+        <Image
           src="/loginbackground.jpg"
           layout="responsive"
           className="object-cover h-screen w-screen"
