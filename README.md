@@ -1,4 +1,20 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Creative Cure
+## Description
+
+Creative Cure is a web application designed to support individuals with psychological and autistic disorders through the use of cultural and creative industries. It provides a range of therapeutic resources, including access to therapists, creative expression tools, music therapy, and community chats, fostering a safe and nurturing environment for healing and growth.
+
+## Problem Statement
+
+Individuals with psychological and autistic disorders often face significant barriers to accessing effective therapy and support. Traditional therapeutic approaches may not fully address their unique needs, leading to inadequate mental health care and limited opportunities for creative self-expression and community engagement.
+
+## Solution
+
+Creative Cure addresses these challenges by integrating cultural and creative industries into the therapeutic process. The platform offers:
+
+- Therapists: Access to a network of specialized therapists who provide personalized care.
+- Creative Tools: Resources like Quickdraw for visual expression and music therapy APIs for emotional regulation.
+- Community Chats: A supportive community where individuals can share experiences and insights.
+- Educational Resources: Articles and tips to aid in the mental health journey.
 
 ## Getting Started
 
