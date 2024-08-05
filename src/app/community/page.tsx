@@ -1,17 +1,19 @@
 "use client";
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, FormEvent } from 'react';
 import { db } from '../firebase';
-import { collection, getDocs, query, where, onSnapshot, doc, addDoc } from 'firebase/firestore';
+import { collection, onSnapshot, addDoc, DocumentData, Timestamp } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../firebase';
-
 import Link from 'next/link'; 
+import { signOut } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 interface ChatMessage {
   id?: string;
   text: string;
   sender: string; // "therapist" or "patient"
   timestamp: number;
+  subject?: string; // Optional field for conversation subject or tag
 }
 
 const CommunityChatsPage = () => {
@@ -19,15 +21,22 @@ const CommunityChatsPage = () => {
   const [newMessage, setNewMessage] = useState('');
   const [user, loading, error] = useAuthState(auth);
   const messageRef = useRef<HTMLInputElement>(null);
-  const { data: session } = useSession();
+  const router = useRouter();
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, 'community_chats'), (snapshot) => {
-      const messagesData = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-        timestamp: (doc.data() as ChatMessage).timestamp?.toMillis() ?? 0, // Handle timestamps
-      })) as ChatMessage[];
+      const messagesData = snapshot.docs.map((doc) => {
+        const data = doc.data() as DocumentData;
+        return {
+          id: doc.id,
+          text: data.text,
+          sender: data.sender,
+          timestamp: typeof data.timestamp === 'number' 
+            ? data.timestamp 
+            : (data.timestamp as Timestamp).toMillis(), // Handle timestamp conversion
+          subject: data.subject,
+        } as ChatMessage;
+      });
       setMessages(messagesData);
     });
 
@@ -40,8 +49,9 @@ const CommunityChatsPage = () => {
       try {
         await addDoc(collection(db, 'community_chats'), {
           text: newMessage,
-          sender: session?.user?.role === 'therapist' ? 'therapist' : 'patient', 
+          sender: user?.uid === 'therapist_id' ? 'therapist' : 'patient', // Adjust the condition according to your user data
           timestamp: Date.now(), // Add timestamp to the message
+          subject: 'General', // Default or user-defined subject
         });
         setNewMessage('');
         if (messageRef.current) {
@@ -78,13 +88,16 @@ const CommunityChatsPage = () => {
           <span className="sr-only">Creative Cure - Therapists</span>
         </Link>
         <nav className="ml-auto flex space-x-4 sm:space-x-6">
+        <Link href="/dashboard" className="text-sm font-medium text-green-600 hover:underline" prefetch={false}>
+            Home
+          </Link>
           <Link href="/therapists" className="text-sm font-medium text-green-600 hover:underline" prefetch={false}>
             Therapists
           </Link>
           <Link href="/patients" className="text-sm font-medium text-green-600 hover:underline" prefetch={false}>
             Patients
           </Link>
-          <Link href="/community-chats" className="text-sm font-medium text-green-600 hover:underline" prefetch={false}>
+          <Link href="/community" className="text-sm font-medium text-green-600 hover:underline" prefetch={false}>
             Community Chats
           </Link>
           <Link href="/about" className="text-sm font-medium text-green-600 hover:underline" prefetch={false}>
@@ -125,13 +138,22 @@ const CommunityChatsPage = () => {
                     <div
                       className={`bg-green-200 rounded-lg px-4 py-2 m-2 max-w-md ${
                         message.sender === 'therapist' ? 'ml-4' : 'mr-4'
-                      }`}
+                      } cursor-pointer`}
+                      onClick={() => {
+                        // Handle click event, e.g., open reply modal
+                        console.log(`Reply to message ${message.id}`);
+                      }}
                     >
                       <p className="text-green-800">
                         {message.text}
                         <span className="text-sm text-gray-500">
                           {` - ${message.sender}`}
                         </span>
+                        {message.subject && (
+                          <span className="text-sm text-gray-500 block mt-1">
+                            {`Subject: ${message.subject}`}
+                          </span>
+                        )}
                       </p>
                     </div>
                   </div>
@@ -174,30 +196,3 @@ const CommunityChatsPage = () => {
 };
 
 export default CommunityChatsPage;
-
-const therapists = [
-  {
-    name: "Katty Houston",
-    specialization: "Child Therapist",
-    image: "/therapist2.jpg",
-    description: "Katty is a licensed child therapist with over 5 years of experience helping youth overcome emotional and behavioral challenges."
-  },
-  {
-    name: "Michael Johnson",
-    specialization: "Art and Autism Therapist",
-    image: "/therapist3.jpg",
-    description: "Michael is a skilled therapist with 15 years of experience who helps young kids with autism express their emotions and work through creative expression."
-  },
-  {
-    name: "Sarah Anderson",
-    specialization: "Autism Therapist",
-    image: "/therapist2.jpg",
-    description: "Sarah is a therapist with 5 years of experience who specializes in helping people with autistic disorders and analyzes the behavior of these people to help them through therapy."
-  },
-  {
-    name: "Audrey Hauston",
-    specialization: "Art and Psychological Therapist",
-    image: "/therapist5.jpg",
-    description: "Audrey is a skilled art therapist who helps youth express their emotions and work through trauma through creative expression."
-  }
-];

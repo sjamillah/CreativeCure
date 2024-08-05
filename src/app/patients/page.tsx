@@ -6,6 +6,8 @@ import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { collection, getDocs, addDoc, query, where } from 'firebase/firestore';
 import { db, auth } from '../firebase'; 
 import { useAuthState } from 'react-firebase-hooks/auth';
+import { signOut } from 'firebase/auth';
+import router from 'next/router';
 
 interface Therapist {
   name: string;
@@ -62,7 +64,6 @@ const PatientsPage = () => {
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
-        // Fetch appointments for the current user only
         const appointmentCollection = collection(db, 'appointments');
         const q = query(appointmentCollection, where('patientId', '==', user?.uid));
         const appointmentSnapshot = await getDocs(q);
@@ -120,12 +121,6 @@ const PatientsPage = () => {
   const handleBooking = async (e: FormEvent) => {
     e.preventDefault();
     try {
-      // Instead of adding the appointment directly, you'll likely want to:
-      // 1.  Trigger a payment process (e.g., using Stripe)
-      // 2.  After successful payment, create the appointment in Firestore
-      // 3.  Update the appointment status to 'confirmed' 
-
-      // For now, we'll just create the appointment with pending status
       await addDoc(collection(db, "appointments"), newAppointment);
       setAppointments([...appointments, { ...newAppointment }]);
       closeModal();
@@ -136,7 +131,6 @@ const PatientsPage = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-green-50">
-      {/* Header */}
       <header className="px-4 lg:px-6 h-16 flex items-center bg-white shadow-md relative top-0 left-0 w-full z-50">
         <Link href="/" className="flex items-center space-x-2" prefetch={false}>
           <img
@@ -155,7 +149,7 @@ const PatientsPage = () => {
           <Link href="/therapists" className="text-sm font-medium text-green-600 hover:underline" prefetch={false}>
             Therapists
           </Link>
-          <Link href="/community-chats" className="text-sm font-medium text-green-600 hover:underline" prefetch={false}>
+          <Link href="/community" className="text-sm font-medium text-green-600 hover:underline" prefetch={false}>
             Community Chats
           </Link>
           <Link href="/about" className="text-sm font-medium text-green-600 hover:underline" prefetch={false}>
@@ -170,7 +164,6 @@ const PatientsPage = () => {
         </nav>
       </header>
 
-      {/* Hero Section */}
       <section className="relative h-screen">
         <Image
           src="/patientsbackground.jpg"
@@ -191,7 +184,6 @@ const PatientsPage = () => {
         </div>
       </section>
 
-      {/* Resources Section */}
       <section className="w-full py-12 md:py-24 lg:py-32 bg-green-50">
         <div className="container mx-auto px-4 md:px-6 space-y-6">
           <div className="space-y-2 text-center">
@@ -204,11 +196,10 @@ const PatientsPage = () => {
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {/* Resource 1: Quickdraw (Drawing Tool) */}
             <div className="bg-white/70 backdrop-blur-lg border border-green-200 rounded-lg shadow-lg hover:shadow-xl transition-shadow p-6 flex flex-col items-center space-y-4">
               <a href="https://quickdraw.withgoogle.com/#" target="_blank" rel="noopener noreferrer">
                 <Image
-                  src="/images/quickdraw.png" // Replace with an image of quickdraw
+                  src="/images/quickdraw.png" 
                   width={64}
                   height={64}
                   alt="Quickdraw"
@@ -225,11 +216,10 @@ const PatientsPage = () => {
               </p>
             </div>
 
-            {/* Resource 2: Music Therapy API (placeholder) */}
             <div className="bg-white/70 backdrop-blur-lg border border-green-200 rounded-lg shadow-lg hover:shadow-xl transition-shadow p-6 flex flex-col items-center space-y-4">
               <a href="#" target="_blank" rel="noopener noreferrer">
                 <Image
-                  src="/images/music-icon.png" // Replace with a music icon
+                  src="/images/music-icon.png" 
                   width={64}
                   height={64}
                   alt="Music Therapy API"
@@ -237,60 +227,38 @@ const PatientsPage = () => {
                 />
               </a>
               <h3 className="text-xl font-semibold text-green-800">
-                Music Therapy API 
+                Music Therapy API
               </h3>
-              <p className="text-green-600">Explore Music for Wellbeing</p>
+              <p className="text-green-600">Soothing Music Playlist</p>
               <p className="text-center text-green-700">
-                Discover music curated for therapeutic benefits.  This API
-                provides a curated selection of music. 
+                Listen to calming music specifically curated to help reduce
+                stress and anxiety.
               </p>
             </div>
 
-            {/* Add more resources as needed */}
-
-          </div>
-        </div>
-      </section>
-
-      {/* Upcoming Sessions Section */}
-      <section className="w-full py-12 md:py-24 lg:py-32 bg-green-50">
-        <div className="container mx-auto px-4 md:px-6 space-y-6">
-          <div className="space-y-2 text-center">
-            <h2 className="text-3xl font-bold text-green-800 sm:text-4xl md:text-5xl">
-              Your Upcoming Sessions
-            </h2>
-          </div>
-          {appointments.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-              {appointments.map((appointment) => (
-                <div
-                  key={appointment.id}
-                  className="bg-white/70 backdrop-blur-lg border border-green-200 rounded-lg shadow-lg hover:shadow-xl transition-shadow p-6 flex flex-col items-center space-y-4"
-                >
-                  <h3 className="text-xl font-semibold text-green-800">
-                    {appointment.date}
-                  </h3>
-                  <p className="text-green-600">
-                    Time: {appointment.time}
-                  </p>
-                  <p className="text-green-600">
-                    Therapist: {appointment.therapist}
-                  </p>
-                  <p className="text-center text-green-700">
-                    Status: {appointment.status}
-                  </p>
-                </div>
-              ))}
+            <div className="bg-white/70 backdrop-blur-lg border border-green-200 rounded-lg shadow-lg hover:shadow-xl transition-shadow p-6 flex flex-col items-center space-y-4">
+              <a href="#" target="_blank" rel="noopener noreferrer">
+                <Image
+                  src="/images/blog-icon.png" 
+                  width={64}
+                  height={64}
+                  alt="Blog"
+                  className="rounded-full object-cover"
+                />
+              </a>
+              <h3 className="text-xl font-semibold text-green-800">
+                Blog
+              </h3>
+              <p className="text-green-600">Inspiration and Tips</p>
+              <p className="text-center text-green-700">
+                Discover articles and insights to help you on your mental health
+                journey.
+              </p>
             </div>
-          ) : (
-            <p className="text-center text-gray-500">
-              You don't have any upcoming sessions scheduled.
-            </p>
-          )}
+          </div>
         </div>
       </section>
 
-      {/* Therapists Section */}
       <section className="w-full py-12 md:py-24 lg:py-32 bg-green-50">
         <div className="container mx-auto px-4 md:px-6 space-y-6">
           <div className="space-y-2 text-center">
@@ -298,28 +266,25 @@ const PatientsPage = () => {
               Meet Our Therapists
             </h2>
             <p className="max-w-2xl mx-auto text-green-700 md:text-xl">
-              Our team of experienced therapists is dedicated to providing
-              therapy to people with autistic and psychological disorders.
+              Our dedicated therapists are here to support you on your journey.
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {isLoading ? (
-              <p className="text-center text-gray-500">Loading therapists...</p> 
+              <p>Loading therapists...</p>
             ) : (
               therapists.map((therapist) => (
                 <div
-                  key={therapist.uid}
+                  key={therapist.name}
                   className="bg-white/70 backdrop-blur-lg border border-green-200 rounded-lg shadow-lg hover:shadow-xl transition-shadow p-6 flex flex-col items-center space-y-4"
                 >
-                  <div className="w-16 h-16 bg-green-200 rounded-full flex items-center justify-center">
-                    <Image
-                      src={therapist.image}
-                      width={64}
-                      height={64}
-                      alt={`${therapist.name} icon`}
-                      className="rounded-full object-cover"
-                    />
-                  </div>
+                  <Image
+                    src={therapist.image}
+                    width={128}
+                    height={128}
+                    alt={therapist.name}
+                    className="rounded-full object-cover"
+                  />
                   <h3 className="text-xl font-semibold text-green-800">
                     {therapist.name}
                   </h3>
@@ -327,11 +292,11 @@ const PatientsPage = () => {
                   <p className="text-center text-green-700">
                     {therapist.description}
                   </p>
-                  <button 
-                    onClick={() => openModal(therapist)} 
-                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 mt-4"
+                  <button
+                    onClick={() => openModal(therapist)}
+                    className="text-sm font-medium text-green-600 hover:underline"
                   >
-                    Book Session
+                    Book Appointment
                   </button>
                 </div>
               ))
@@ -340,108 +305,101 @@ const PatientsPage = () => {
         </div>
       </section>
 
-      <footer className="bg-green-100 p-6 md:py-12 w-full">
-        <div className="container max-w-7xl mx-auto flex justify-center items-center">
-          <div>
-            <p className="text-sm text-gray-600">
-              Creative Cure 2024 © COMP 2800
+      <section className="w-full py-12 md:py-24 lg:py-32 bg-green-50">
+        <div className="container mx-auto px-4 md:px-6 space-y-6">
+          <div className="space-y-2 text-center">
+            <h2 className="text-3xl font-bold text-green-800 sm:text-4xl md:text-5xl">
+              Upcoming or Booked Sessions
+            </h2>
+            <p className="max-w-2xl mx-auto text-green-700 md:text-xl">
+              Here are your upcoming or booked therapy sessions.
             </p>
           </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            {appointments.length === 0 ? (
+              <p>No upcoming sessions.</p>
+            ) : (
+              appointments.map((appointment) => (
+                <div
+                  key={appointment.id}
+                  className="bg-white/70 backdrop-blur-lg border border-green-200 rounded-lg shadow-lg hover:shadow-xl transition-shadow p-6 flex flex-col items-center space-y-4"
+                >
+                  <h3 className="text-xl font-semibold text-green-800">
+                    {appointment.therapist}
+                  </h3>
+                  <p className="text-green-600">
+                    {appointment.date} at {appointment.time}
+                  </p>
+                  <p className="text-center text-green-700">
+                    Status: {appointment.status}
+                  </p>
+                </div>
+              ))
+            )}
+          </div>
         </div>
-      </footer>
-      {/* Appointment Booking Modal */}
+      </section>
+
       <Modal
         isOpen={isModalOpen}
         onRequestClose={closeModal}
-        contentLabel="Book Appointment Modal"
-        className="bg-white p-6 rounded-lg shadow-lg max-w-md mx-auto mt-20"
+        contentLabel="Book Appointment"
+        className="fixed inset-0 flex items-center justify-center p-4 bg-black bg-opacity-50"
         overlayClassName="fixed inset-0 bg-black bg-opacity-50"
       >
-        <h2 className="text-xl font-bold mb-4">Book Appointment</h2>
-        <form onSubmit={handleBooking}>
-          <div className="mb-4">
-            <label htmlFor="date" className="block text-gray-700">Date</label>
-            <input
-              id="date"
-              type="date"
-              value={newAppointment.date}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="time" className="block text-gray-700">Time</label>
-            <input
-              id="time"
-              type="time"
-              value={newAppointment.time}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="therapist" className="block text-gray-700">Therapist</label>
-            <select
-              id="therapist"
-              value={newAppointment.therapist}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded"
-            >
-              {!isLoading && therapists.map((therapist) => (
-                <option key={therapist.uid} value={therapist.name}>
-                  {therapist.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="flex justify-end space-x-4">
-            <button
-              type="button"
-              onClick={closeModal}
-              className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-            >
-              Book Appointment
-            </button>
-          </div>
-        </form>
+        <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+          <h2 className="text-2xl font-semibold mb-4">Book Appointment</h2>
+          {selectedTherapist && (
+            <div className="mb-4">
+              <h3 className="text-xl font-medium">{selectedTherapist.name}</h3>
+              <p className="text-green-600">{selectedTherapist.specialization}</p>
+            </div>
+          )}
+          <form onSubmit={handleBooking} className="space-y-4">
+            <div>
+              <label htmlFor="date" className="block text-sm font-medium text-gray-700">
+                Date
+              </label>
+              <input
+                type="date"
+                id="date"
+                value={newAppointment.date}
+                onChange={handleInputChange}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm"
+              />
+            </div>
+            <div>
+              <label htmlFor="time" className="block text-sm font-medium text-gray-700">
+                Time
+              </label>
+              <input
+                type="time"
+                id="time"
+                value={newAppointment.time}
+                onChange={handleInputChange}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm"
+              />
+            </div>
+            <div className="mt-6 flex justify-end">
+              <button
+                type="button"
+                onClick={closeModal}
+                className="mr-4 px-4 py-2 bg-gray-200 text-gray-800 rounded-md"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 bg-green-600 text-white rounded-md"
+              >
+                Book
+              </button>
+            </div>
+          </form>
+        </div>
       </Modal>
     </div>
   );
-}
+};
 
 export default PatientsPage;
-
-const therapists = [
-  {
-    name: "Katty Houston",
-    specialization: "Child Therapist",
-    image: "/therapist2.jpg",
-    description: "Jessica is a licensed child therapist with over 5 years of experience helping youth overcome emotional and behavioral challenges."
-  },
-  {
-    name: "Michael Johnson",
-    specialization: "Art and Autism Therapist",
-    image: "/therapist3.jpg",
-    description: "Michael is a skilled therapist with 15 years of experience who helps young kids with autism express their emotions and work through creative expression."
-  },
-  {
-    name: "Sarah Anderson",
-    specialization: "Autism Therapist",
-    image: "/therapist2.jpg",
-    description: "Sarah is a therapist with 5 years of experience who specializes in helping people with autistic disorders and analyzes the behavior of these people to help them through therapy."
-  },
-  {
-    name: "Audrey Hauston",
-    specialization: "Art and Psychological Therapist",
-    image: "/therapist5.jpg",
-    description: "Audrey is a skilled art therapist who helps youth express their emotions and work through trauma through creative expression."
-  }
-];

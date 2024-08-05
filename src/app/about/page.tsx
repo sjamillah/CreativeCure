@@ -38,12 +38,12 @@ const About = () => {
             Home
           </Link>
           <Link href="/therapists" className="text-sm font-medium text-green-600 hover:underline" prefetch={false}>
-            Patients
+            Therapists
           </Link>
           <Link href="/patients" className="text-sm font-medium text-green-600 hover:underline" prefetch={false}>
             Patients
           </Link>
-          <Link href="/community-chats" className="text-sm font-medium text-green-600 hover:underline" prefetch={false}>
+          <Link href="/community" className="text-sm font-medium text-green-600 hover:underline" prefetch={false}>
             Community Chats
           </Link>
           <Link href="/about" className="text-sm font-medium text-green-600 hover:underline" prefetch={false}>

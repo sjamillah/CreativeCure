@@ -2,24 +2,36 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { auth } from "../firebase"; // Adjust the import path as needed
+import { auth } from "../firebase"; // 
 import { createUserWithEmailAndPassword, updateProfile, User } from "firebase/auth";
+import { getFirestore, doc, setDoc } from "firebase/firestore";
 
 // Define the type for form data
 interface FormData {
   name: string;
   email: string;
   password: string;
+  role: 'therapist' | 'patient'; // Added role
 }
 
 export default function SignUp() {
-  const [formData, setFormData] = useState<FormData>({ name: "", email: "", password: "" });
+  const [formData, setFormData] = useState<FormData>({
+    name: "",
+    email: "",
+    password: "",
+    role: 'patient', // Default role
+  });
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const db = getFirestore(); // Initialize Firestore
 
   // Handle input changes and update form data
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
 
   // Handle form submission
@@ -30,10 +42,16 @@ export default function SignUp() {
       const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
       const user: User = userCredential.user;
 
-      console.log("User registered:", user);
-
       // Update user profile with display name
       await updateProfile(user, { displayName: formData.name });
+
+      // Save user role to Firestore
+      const userDocRef = doc(db, 'users', user.uid);
+      await setDoc(userDocRef, {
+        name: formData.name,
+        email: formData.email,
+        role: formData.role,
+      });
 
       // Redirect to the dashboard after successful signup
       router.push("/dashboard");
@@ -46,13 +64,13 @@ export default function SignUp() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-green-100">
       <div className="absolute inset-0 z-0"> {/* Add a div for the background image */}
-<img
-  src="/loginbackground.jpg"
-  layout="responsive"
-  className="object-cover h-screen w-screen"
-  alt="Background Image"
-/>
-</div>
+        <img
+          src="/loginbackground.jpg"
+          layout="responsive"
+          className="object-cover h-screen w-screen"
+          alt="Background Image"
+        />
+      </div>
       <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full z-10">
         <h1 className="text-2xl font-bold mb-6 text-green-800">Sign Up</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -91,6 +109,19 @@ export default function SignUp() {
               onChange={handleChange}
               className="w-full px-4 py-2 border border-green-300 rounded-lg focus:outline-none focus:ring focus:border-green-500"
             />
+          </div>
+          <div>
+            <label htmlFor="role" className="block text-green-700">Role</label>
+            <select
+              id="role"
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border border-green-300 rounded-lg focus:outline-none focus:ring focus:border-green-500"
+            >
+              <option value="patient">Patient</option>
+              <option value="therapist">Therapist</option>
+            </select>
           </div>
           {error && <p className="text-red-500 text-sm">{error}</p>}
           <button type="submit" className="w-full py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
