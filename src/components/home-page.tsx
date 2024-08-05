@@ -3,7 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import React from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth, signOut } from '../firebase';
+import { auth } from "@/app/firebase";
+import { signOut } from "firebase/auth";
 import { useRouter } from 'next/navigation';
 
 const Home = () => {

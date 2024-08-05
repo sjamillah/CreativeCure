@@ -6,6 +6,7 @@ import { auth, db, storage } from '../firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 interface ProfileData {
   name?: string;
@@ -134,7 +135,7 @@ const Profile = () => {
             <p className="text-gray-700">Address: {profileData.address}</p>
             {profileData.image && (
               <div>
-                <img src={profileData.image} alt="Profile" className="w-32 h-32 rounded-full object-cover" />
+                <Image src={profileData.image} alt="Profile" className="w-32 h-32 rounded-full object-cover" />
               </div>
             )}
             <button onClick={() => setIsEditing(true)} className="w-full py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
