@@ -9,6 +9,7 @@ import { auth } from '../firebase';
 import { useRouter } from 'next/navigation';
 import { signOut } from 'firebase/auth';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface Therapist {
   name: string;
@@ -141,7 +142,7 @@ const TherapistsPage = () => {
     <div className="flex flex-col min-h-screen bg-green-50 relative">
       <header className="px-4 lg:px-6 h-16 flex items-center bg-white shadow-md fixed top-0 left-0 w-full z-50">
         <Link href="/" className="flex items-center space-x-2">
-          <img
+          <Image
             src="/creativelogo.png"
             width={24}
             height={24}
@@ -181,7 +182,7 @@ const TherapistsPage = () => {
                 className="bg-white shadow rounded-lg p-4 cursor-pointer"
                 onClick={() => openModal(therapist)}
               >
-                <img src={therapist.image} alt={therapist.name} className="w-full h-40 object-cover rounded-lg mb-4" />
+                <Image src={therapist.image} alt={therapist.name} className="w-full h-40 object-cover rounded-lg mb-4" />
                 <h2 className="text-xl font-semibold">{therapist.name}</h2>
                 <p className="text-gray-600">{therapist.specialization}</p>
                 <button

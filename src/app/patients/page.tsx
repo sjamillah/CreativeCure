@@ -178,8 +178,8 @@ const PatientsPage = () => {
             Creative Cure - Patients
           </h1>
           <p className="text-lg text-white/80 max-w-xl">
-            <span className="italic font-light">You are not alone in your journey. We believe in creating a space where you feel safe to explore, grow, and heal.</span> <br />
-            <span className="italic font-light">Our therapists are dedicated to helping you find your strength and resilience. We're here to support you every step of the way.</span>
+            <span className="italic font-light justify-center text-center">You are not alone in your journey. We believe in creating a space where you feel safe to explore, grow, and heal.</span> <br />
+            <span className="italic font-light justify-center text-center">Our therapists are dedicated to helping you find your strength and resilience. We&apos;re here to support you every step of the way.</span>
           </p>
         </div>
       </section>
